@@ -1,13 +1,15 @@
-import React from "react";
+import React from 'react';
 
-import { Content as AntdContent } from "antd/lib/layout/layout";
+import { Content as AntdContent } from 'antd/lib/layout/layout';
 
-interface IPropsContent {}
+interface IPropsContent {
+  children: any
+}
 
 class Content extends React.Component<IPropsContent> {
   render() {
     return (
-      <div style={{ margin: "20px", flex: "grow" }}>
+      <div style={{ margin: '20px', flex: 'grow' }}>
         <AntdContent>{this.props.children}</AntdContent>
       </div>
     );
