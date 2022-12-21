@@ -1,10 +1,6 @@
 import React from 'react';
 import { Kanban } from '../kanban/Kanban';
 
-const Landing = () => (
-  <div>
-    <Kanban />
-  </div>
-);
+const Landing = () => <Kanban />;
 
 export { Landing };
