@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 
 // interface ITask {
 //   id: string;
@@ -21,8 +21,8 @@ interface IKanban {
 const Kanban = ({ columns }: IKanban) => {
   const [kanbanColumns, setKanbanColumns] = useState<IColumn[]>(columns);
 
-  const handleOnDragEnd = (result:any) => {
-    if (result.source === undefined || result.destination === undefined) {
+  const handleOnDragEnd = (result:DropResult) => {
+    if (result.destination === undefined || result.destination === null) {
       return;
     }
 
@@ -44,9 +44,9 @@ const Kanban = ({ columns }: IKanban) => {
     destinationTasks.splice(result.destination.index, 0, itemInserted);
 
     const newKanbanColumns = kanbanColumns.map((column) => {
-      if (column.id === result.source.droppableId) {
+      if (column.id === sourceColumnId) {
         return { ...column, tasks: sourceTasks };
-      } if (column.id === result.destination.droppableId) {
+      } if (column.id === destinationColumnId) {
         return { ...column, tasks: destinationTasks };
       }
       return column;
