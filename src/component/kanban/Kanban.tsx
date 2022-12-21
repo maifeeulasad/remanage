@@ -18,32 +18,8 @@ interface IKanban {
   columns: IColumn[];
 }
 
-const initialData: IKanban = {
-  columns: [{
-    id: 'Backlog',
-    title: 'Backlog',
-    tasks: ['prem', 'taka', 'time', 'poralekha'],
-  },
-  {
-    id: 'ToDo',
-    title: 'To Do',
-    tasks: ['hmmm... shob'],
-  },
-  {
-    id: 'WIP',
-    title: 'WIP',
-    tasks: ['janinah'],
-  },
-  {
-    id: 'Completed',
-    title: 'Completee',
-    tasks: [],
-  },
-  ],
-};
-
-const Kanban = () => {
-  const [kanban, setKanban] = useState<IKanban>(initialData);
+const Kanban = ({ columns }: IKanban) => {
+  const [kanbanColumns, setKanbanColumns] = useState<IColumn[]>(columns);
 
   const handleOnDragEnd = (result:any) => {
     if (result.source === undefined || result.destination === undefined) {
@@ -53,8 +29,8 @@ const Kanban = () => {
     const sourceColumnId = result.source.droppableId;
     const destinationColumnId = result.destination.droppableId;
 
-    const sourceColumn = kanban.columns.find((column) => column.id === sourceColumnId);
-    const destinationColumn = kanban.columns.find((column) => column.id === destinationColumnId);
+    const sourceColumn = kanbanColumns.find((column) => column.id === sourceColumnId);
+    const destinationColumn = kanbanColumns.find((column) => column.id === destinationColumnId);
 
     if (sourceColumn === undefined || destinationColumn === undefined) {
       return;
@@ -67,8 +43,7 @@ const Kanban = () => {
     sourceTasks.splice(result.source.index, 1);
     destinationTasks.splice(result.destination.index, 0, itemInserted);
 
-    const newkanban = { ...kanban };
-    newkanban.columns = kanban.columns.map((column) => {
+    const newKanbanColumns = kanbanColumns.map((column) => {
       if (column.id === result.source.droppableId) {
         return { ...column, tasks: sourceTasks };
       } if (column.id === result.destination.droppableId) {
@@ -76,13 +51,13 @@ const Kanban = () => {
       }
       return column;
     });
-    setKanban(newkanban);
+    setKanbanColumns(newKanbanColumns);
   };
 
   return (
     <DragDropContext onDragEnd={handleOnDragEnd}>
       <div style={{ display: 'flex' }} className="dropped-content">
-        {kanban.columns.map((column) => (
+        {kanbanColumns.map((column) => (
           <Droppable key={column.title} droppableId={column.id}>
             {(provided) => (
               <div
