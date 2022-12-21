@@ -1,107 +1,118 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable react/no-unused-prop-types */
-/* eslint-disable max-len */
-import React from 'react';
-// @ts-ignore
-import { v4 as uuid } from 'uuid';
-// @ts-ignore
-import Board from '@asseinfo/react-kanban';
-import '@asseinfo/react-kanban/dist/styles.css';
+import React, { useState } from 'react';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
-const board = {
-  columns: [
-    {
-      id: 1,
-      title: 'Backlog',
-      cards: [
-        {
-          id: 1,
-          title: 'Card title 1',
-          description: 'Card content',
-        },
-        {
-          id: 2,
-          title: 'Card title 2',
-          description: 'Card content',
-        },
-        {
-          id: 3,
-          title: 'Card title 3',
-          description: 'Card content',
-        },
-      ],
-    },
-    {
-      id: 2,
-      title: 'Doing',
-      cards: [
-        {
-          id: 9,
-          title: 'Card title 9',
-          description: 'Card content',
-        },
-      ],
-    },
-    {
-      id: 3,
-      title: 'Q&A',
-      cards: [
-        {
-          id: 10,
-          title: 'Card title 10',
-          description: 'Card content',
-        },
-        {
-          id: 11,
-          title: 'Card title 11',
-          description: 'Card content',
-        },
-      ],
-    },
-    {
-      id: 4,
-      title: 'Production',
-      cards: [
-        {
-          id: 12,
-          title: 'Card title 12',
-          description: 'Card content',
-        },
-        {
-          id: 13,
-          title: 'Card title 13',
-          description: 'Card content',
-        },
-      ],
-    },
+// interface ITask {
+//   id: string;
+//   title: string;
+//   details: string;
+//   metadeta: JSON;
+// }
+
+interface IColumn {
+  id: string;
+  title: string;
+  tasks: string[];
+}
+
+interface IKanban {
+  columns: IColumn[];
+}
+
+const initialData: IKanban = {
+  columns: [{
+    id: 'Backlog',
+    title: 'Backlog',
+    tasks: ['prem', 'taka', 'time', 'poralekha'],
+  },
+  {
+    id: 'ToDo',
+    title: 'To Do',
+    tasks: ['hmmm... shob'],
+  },
+  {
+    id: 'WIP',
+    title: 'WIP',
+    tasks: ['janinah'],
+  },
+  {
+    id: 'Completed',
+    title: 'Completee',
+    tasks: [],
+  },
   ],
 };
 
-const ColumnAdder = ({ addColumn }:{ addColumn:any }) => (
-  <div onClick={() => { addColumn({ id: uuid(), title: 'hmm' }); }}>
-    Add column
-  </div>
-);
+const Kanban = () => {
+  const [stateData, updateStateData] = useState<IKanban>(initialData);
 
-const Kanban = () => (
-  <div>
-    <Board
-      allowRemoveLane
-      allowRenameColumn
-      allowRemoveCard
-      onLaneRemove={console.log}
-      onCardRemove={console.log}
-      initialBoard={board}
-      renderColumnAdder={({ addColumn }:{ addColumn:any }) => <ColumnAdder addColumn={addColumn} />}
-      allowAddCard={{ on: 'top' }}
-      onNewCardConfirm={(draftCard:any) => ({
-        id: new Date().getTime(),
-        ...draftCard,
-      })}
-      onCardNew={console.log}
-    />
-  </div>
-);
+  const handleOnDragEnd = (result:any) => {
+    if (result.destination === undefined) {
+      return;
+    }
+
+    // eslint-disable-next-line max-len
+    const destinationObject = stateData.columns.find((column) => column.id === result.destination.droppableId);
+    // eslint-disable-next-line max-len
+    const sourceObject = stateData.columns.find((column) => column.id === result.source.droppableId);
+    if (sourceObject === undefined || destinationObject === undefined) {
+      return;
+    }
+
+    const destinationArray = destinationObject.tasks;
+    const sourceArray = sourceObject.tasks;
+
+    const itemInserted = sourceArray[result.source.index];
+    sourceArray.splice(result.source.index, 1);
+    destinationArray.splice(result.destination.index, 0, itemInserted);
+
+    const newStateData = { ...stateData };
+    newStateData.columns = stateData.columns.map((column) => {
+      if (column.id === result.source.droppableId) {
+        return { ...column, tasks: sourceArray };
+      } if (column.id === result.destination.droppableId) {
+        return { ...column, tasks: destinationArray };
+      }
+      return column;
+    });
+    updateStateData(newStateData);
+  };
+
+  return (
+    <DragDropContext onDragEnd={handleOnDragEnd}>
+      <div style={{ display: 'flex' }} className="dropped-content">
+        {stateData.columns.map((column) => (
+          <Droppable key={column.title} droppableId={column.id}>
+            {(provided) => (
+              <div
+                style={{ margin: '20px' }}
+                className="dropped-container"
+                ref={provided.innerRef}
+              >
+                <h3>{column.title}</h3>
+                {column.tasks.map((item, index) => (
+                  <Draggable key={item} draggableId={item} index={index}>
+                    {(providedItem) => (
+                      <p
+                        className="drop-list-item list-none text-red-400"
+                        ref={providedItem.innerRef}
+                            // eslint-disable-next-line react/jsx-props-no-spreading
+                        {...providedItem.draggableProps}
+                            // eslint-disable-next-line react/jsx-props-no-spreading
+                        {...providedItem.dragHandleProps}
+                      >
+                        {item}
+                      </p>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        ))}
+      </div>
+    </DragDropContext>
+  );
+};
 
 export { Kanban };
