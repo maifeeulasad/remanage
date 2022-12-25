@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 
-// interface ITask {
-//   id: string;
-//   title: string;
-//   details: string;
-//   metadeta: JSON;
-// }
+interface ITask {
+  id: string;
+  title: string;
+  details: string;
+  metadeta?: { [Key: string]: string };
+}
 
 interface IColumn {
   id: string;
   title: string;
-  tasks: string[];
+  tasks: ITask[];
 }
 
 interface IKanban {
@@ -67,9 +67,9 @@ const Kanban = ({ columns }: IKanban) => {
               >
                 <h3>{column.title}</h3>
                 {column.tasks.map((item, index) => (
-                  <Draggable key={item} draggableId={item} index={index}>
+                  <Draggable key={item.id} draggableId={item.id} index={index}>
                     {(providedItem) => (
-                      <p
+                      <div
                         className="drop-list-item list-none text-red-400"
                         ref={providedItem.innerRef}
                             // eslint-disable-next-line react/jsx-props-no-spreading
@@ -77,8 +77,9 @@ const Kanban = ({ columns }: IKanban) => {
                             // eslint-disable-next-line react/jsx-props-no-spreading
                         {...providedItem.dragHandleProps}
                       >
-                        {item}
-                      </p>
+                        <h1>{item.title}</h1>
+                        <h6>{item.details}</h6>
+                      </div>
                     )}
                   </Draggable>
                 ))}
