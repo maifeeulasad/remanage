@@ -1,25 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
+import { getColumnDB, setColumnDB } from '../../database/local/localbase';
 
-interface ITask {
-  id: string;
-  title: string;
-  details: string;
-  metadeta?: { [Key: string]: string };
-}
+import { IColumn } from './kanban.types';
 
-interface IColumn {
-  id: string;
-  title: string;
-  tasks: ITask[];
-}
+const Kanban = () => {
+  const [kanbanColumns, setKanbanColumns] = useState<IColumn[]>([]);
 
-interface IKanban {
-  columns: IColumn[];
-}
-
-const Kanban = ({ columns }: IKanban) => {
-  const [kanbanColumns, setKanbanColumns] = useState<IColumn[]>(columns);
+  useEffect(() => {
+    getColumnDB().then((res:any) => setKanbanColumns(res));
+  }, []);
 
   const handleOnDragEnd = (result:DropResult) => {
     if (result.destination === undefined || result.destination === null) {
@@ -51,18 +41,18 @@ const Kanban = ({ columns }: IKanban) => {
       }
       return column;
     });
+    setColumnDB(newKanbanColumns);
     setKanbanColumns(newKanbanColumns);
   };
 
   return (
     <DragDropContext onDragEnd={handleOnDragEnd}>
-      <div style={{ display: 'flex' }} className="dropped-content">
+      <div style={{ display: 'flex' }}>
         {kanbanColumns.map((column) => (
           <Droppable key={column.title} droppableId={column.id}>
             {(provided) => (
               <div
                 style={{ margin: '20px' }}
-                className="dropped-container"
                 ref={provided.innerRef}
               >
                 <h3>{column.title}</h3>
@@ -70,7 +60,6 @@ const Kanban = ({ columns }: IKanban) => {
                   <Draggable key={item.id} draggableId={item.id} index={index}>
                     {(providedItem) => (
                       <div
-                        className="drop-list-item list-none text-red-400"
                         ref={providedItem.innerRef}
                             // eslint-disable-next-line react/jsx-props-no-spreading
                         {...providedItem.draggableProps}
@@ -78,7 +67,7 @@ const Kanban = ({ columns }: IKanban) => {
                         {...providedItem.dragHandleProps}
                       >
                         <h1>{item.title}</h1>
-                        <h6>{item.details}</h6>
+                        <p>{item.details}</p>
                       </div>
                     )}
                   </Draggable>
