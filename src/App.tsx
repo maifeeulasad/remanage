@@ -13,10 +13,10 @@ const App = () => (
   <BrowserRouter basename="/remanage">
     <CustomLayout>
       <Routes>
-        <Route path="/landing" element={<Landing />} />
+        <Route path="/" element={<Landing />} />
         <Route
           path="*"
-          element={<Navigate to="/landing" replace />}
+          element={<Navigate to="/" replace />}
         />
       </Routes>
     </CustomLayout>
