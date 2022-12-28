@@ -21,7 +21,6 @@ const App = () => (
       </Routes>
     </CustomLayout>
   </BrowserRouter>
-
 );
 
 // eslint-disable-next-line import/no-default-export
