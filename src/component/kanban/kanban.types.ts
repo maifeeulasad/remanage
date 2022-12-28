@@ -12,5 +12,5 @@ export interface IColumn {
 }
 
 export interface IKanban {
-  columns: IColumn[];
+  cellWidth?: number;
 }

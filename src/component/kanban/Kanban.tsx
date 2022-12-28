@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import { getColumnDB, setColumnDB } from '../../database/local/localbase';
 
-import { IColumn } from './kanban.types';
+import { IColumn, IKanban } from './kanban.types';
 
-const Kanban = () => {
+const Kanban = ({ cellWidth }: IKanban) => {
   const [kanbanColumns, setKanbanColumns] = useState<IColumn[]>([]);
 
   useEffect(() => {
@@ -52,7 +52,7 @@ const Kanban = () => {
           <Droppable key={column.title} droppableId={column.id}>
             {(provided) => (
               <div
-                style={{ margin: '20px' }}
+                style={{ margin: '20px', border: 'red dotted 1px' }}
                 ref={provided.innerRef}
               >
                 <h3>{column.title}</h3>
@@ -66,8 +66,10 @@ const Kanban = () => {
                             // eslint-disable-next-line react/jsx-props-no-spreading
                         {...providedItem.dragHandleProps}
                       >
-                        <h1>{item.title}</h1>
-                        <p>{item.details}</p>
+                        <div style={{ border: 'blue solid 1px', minWidth: `${cellWidth || '200'} px !important` }}>
+                          <h1>{item.title}</h1>
+                          <p>{item.details}</p>
+                        </div>
                       </div>
                     )}
                   </Draggable>
