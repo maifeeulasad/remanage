@@ -1,6 +1,7 @@
-import { defineConfig } from 'vite'
-import svgrPlugin from 'vite-plugin-svgr'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vite";
+import svgrPlugin from "vite-plugin-svgr";
+import react from "@vitejs/plugin-react";
+import { esbuildCommonjs } from "@originjs/vite-plugin-commonjs";
 import ViteVisualizer from "rollup-plugin-visualizer";
 
 // https://vitejs.dev/config/
@@ -8,9 +9,9 @@ export default defineConfig({
   // This changes the out put dir from dist to build
   // comment this out if that isn't relevant for your project
   build: {
-    outDir: './build',
+    outDir: "./build",
   },
-  base: './',
+  base: "./",
   plugins: [
     react(),
     svgrPlugin({
@@ -21,8 +22,13 @@ export default defineConfig({
     }),
     // last one is the visualizer
     ViteVisualizer({
-      filename: './build/report-rollup-plugin-visualizer.html',
+      filename: "./build/report-rollup-plugin-visualizer.html",
       brotliSize: true,
     }),
   ],
-})
+  optimizeDeps: {
+    esbuildOptions: {
+      plugins: [esbuildCommonjs(["localbase"])],
+    },
+  },
+});
