@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
-import { getColumnDB, setColumnDB } from '../../database/local/localbase';
+// import { getColumnDB, setColumnDB } from '../../database/local/localbase';
+import { getColumnDB, setColumnDB } from '../../database/local/idb';
 
 import { IColumn, IKanban } from './kanban.types';
 

@@ -28,7 +28,7 @@ export default defineConfig({
   ],
   optimizeDeps: {
     esbuildOptions: {
-      plugins: [esbuildCommonjs(["localbase"])],
+      plugins: [esbuildCommonjs(["localbase", "util", "ordered-uuid"])],
     },
   },
 });
