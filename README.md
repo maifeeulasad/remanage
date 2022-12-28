@@ -1,4 +1,4 @@
-# Deployment ready (React + TS + Vite + Tailwind)
+# Read-Me
 
 GitHub page should be available here: https://maifeeulasad.github.io/remanage
 
