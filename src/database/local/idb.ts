@@ -1,11 +1,10 @@
 import { IDBPDatabase, openDB } from 'idb';
 import { IColumn } from '../../component/kanban/kanban.types';
-import { seed } from './seed';
 
 let db: IDBPDatabase | undefined;
 const databaseName = 'kanban-idb';
 
-openDB(databaseName, 1, {
+const init = () => openDB(databaseName, 1, {
   upgrade(dbUpgrade: IDBPDatabase) {
     if (!dbUpgrade.objectStoreNames.contains('kanban')) {
       dbUpgrade.createObjectStore('kanban', { keyPath: 'id' });
@@ -31,6 +30,4 @@ const setColumnDB = (data: IColumn[]) : Promise<void> => {
   return Promise.resolve();
 };
 
-setColumnDB(seed); // it will produce error the first time
-
-export { getColumnDB, setColumnDB };
+export { init, getColumnDB, setColumnDB };
