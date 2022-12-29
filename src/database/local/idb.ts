@@ -20,6 +20,14 @@ const getColumnDB = () : Promise<IColumn[]> => {
   const store = tx.objectStore('kanban');
   return store.getAll().then((res: IColumn[]) => Promise.resolve(res));
 };
+
+const getColumnNamesDB = () : Promise<string[]> => {
+  if (!db) return Promise.reject(new Error('DB not defined'));
+  const tx = db.transaction('kanban', 'readonly');
+  const store = tx.objectStore('kanban');
+  return store.getAllKeys().then((res: IDBValidKey[]) => Promise.resolve(res as string[]));
+};
+
 const setColumnDB = (data: IColumn[]) : Promise<void> => {
   if (!db) return Promise.reject(new Error('DB not defined'));
   const tx = db.transaction('kanban', 'readwrite');
@@ -30,4 +38,4 @@ const setColumnDB = (data: IColumn[]) : Promise<void> => {
   return Promise.resolve();
 };
 
-export { init, getColumnDB, setColumnDB };
+export { init, getColumnDB, getColumnNamesDB, setColumnDB };
