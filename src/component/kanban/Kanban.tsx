@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   DragDropContext,
   Droppable,
@@ -6,20 +6,14 @@ import {
   DropResult,
 } from 'react-beautiful-dnd';
 import { Button, Modal } from 'antd';
-import { DbState, kanbanDb } from '../../database/local/hooks/indexed-db-hooks';
+import { kanbanDb } from '../../database/local/hooks/indexed-db-hooks';
 
-import { IColumn, IKanban } from './kanban.types';
+import { IKanban } from './kanban.types';
+import { seed } from '../../database/local/seed';
 
 const Kanban = ({ cellWidth }: IKanban) => {
-  const [kanbanColumns, setKanbanColumns] = useState<IColumn[]>([]);
-  const { setColumn, getColumn, dbState } = kanbanDb();
+  const { setKanbanColumns, kanbanColumns, loading } = kanbanDb();
   const [addItemModalVisibility, setAddItemModalVisibility] = useState(false);
-
-  useEffect(() => {
-    if (dbState === DbState.COMPLETED) {
-      getColumn().then((columns) => setKanbanColumns(columns));
-    }
-  }, [dbState]);
 
   const handleOnDragEnd = (result: DropResult) => {
     if (result.destination === undefined || result.destination === null) {
@@ -56,7 +50,6 @@ const Kanban = ({ cellWidth }: IKanban) => {
       }
       return column;
     });
-    setColumn(newKanbanColumns);
     setKanbanColumns(newKanbanColumns);
   };
 
@@ -67,10 +60,11 @@ const Kanban = ({ cellWidth }: IKanban) => {
         <Button
           type="primary"
           onClick={() => {
-            setAddItemModalVisibility(true);
+            // setAddItemModalVisibility(true);
+            setKanbanColumns(seed);
           }}
         >
-          Add Item
+          Add Seed
         </Button>
       </div>
       <Modal

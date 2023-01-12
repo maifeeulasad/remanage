@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import { CustomLayout } from './layout/CustomLayout';
 import { Landing } from './component/landing/Landing';
-// import { seed } from './database/local/seed';
 
 const App = () => (
   <BrowserRouter basename="/remanage/">
