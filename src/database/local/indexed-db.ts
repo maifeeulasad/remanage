@@ -17,8 +17,6 @@ const initDb = (): Promise<IDBDatabase> =>
       db.createObjectStore('kanban', {
         keyPath: 'id',
       });
-
-      resolve(db);
     };
   });
 
