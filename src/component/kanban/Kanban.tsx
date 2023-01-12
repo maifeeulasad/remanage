@@ -1,18 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
-// import { getColumnDB, setColumnDB } from '../../database/local/localbase';
-import { getColumnDB, setColumnDB } from '../../database/local/idb';
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from 'react-beautiful-dnd';
+import { DbState, kanbanDb } from '../../database/local/hooks/indexed-db-hooks';
 
 import { IColumn, IKanban } from './kanban.types';
 
 const Kanban = ({ cellWidth }: IKanban) => {
   const [kanbanColumns, setKanbanColumns] = useState<IColumn[]>([]);
+  const { setColumn, getColumn, dbState } = kanbanDb();
 
   useEffect(() => {
-    getColumnDB().then((res:any) => setKanbanColumns(res));
-  }, []);
+    if (dbState === DbState.COMPLETED) {
+      getColumn().then((columns) => setKanbanColumns(columns));
+    }
+  }, [dbState]);
 
-  const handleOnDragEnd = (result:DropResult) => {
+  const handleOnDragEnd = (result: DropResult) => {
     if (result.destination === undefined || result.destination === null) {
       return;
     }
@@ -20,8 +27,12 @@ const Kanban = ({ cellWidth }: IKanban) => {
     const sourceColumnId = result.source.droppableId;
     const destinationColumnId = result.destination.droppableId;
 
-    const sourceColumn = kanbanColumns.find((column) => column.id === sourceColumnId);
-    const destinationColumn = kanbanColumns.find((column) => column.id === destinationColumnId);
+    const sourceColumn = kanbanColumns.find(
+      (column) => column.id === sourceColumnId,
+    );
+    const destinationColumn = kanbanColumns.find(
+      (column) => column.id === destinationColumnId,
+    );
 
     if (sourceColumn === undefined || destinationColumn === undefined) {
       return;
@@ -37,12 +48,13 @@ const Kanban = ({ cellWidth }: IKanban) => {
     const newKanbanColumns = kanbanColumns.map((column) => {
       if (column.id === sourceColumnId) {
         return { ...column, tasks: sourceTasks };
-      } if (column.id === destinationColumnId) {
+      }
+      if (column.id === destinationColumnId) {
         return { ...column, tasks: destinationTasks };
       }
       return column;
     });
-    setColumnDB(newKanbanColumns);
+    setColumn(newKanbanColumns);
     setKanbanColumns(newKanbanColumns);
   };
 
@@ -62,12 +74,17 @@ const Kanban = ({ cellWidth }: IKanban) => {
                     {(providedItem) => (
                       <div
                         ref={providedItem.innerRef}
-                            // eslint-disable-next-line react/jsx-props-no-spreading
+                        // eslint-disable-next-line react/jsx-props-no-spreading
                         {...providedItem.draggableProps}
-                            // eslint-disable-next-line react/jsx-props-no-spreading
+                        // eslint-disable-next-line react/jsx-props-no-spreading
                         {...providedItem.dragHandleProps}
                       >
-                        <div style={{ border: 'blue solid 1px', minWidth: `${cellWidth || '200'} px !important` }}>
+                        <div
+                          style={{
+                            border: 'blue solid 1px',
+                            minWidth: `${cellWidth || '200'} px !important`,
+                          }}
+                        >
                           <h1>{item.title}</h1>
                           <p>{item.details}</p>
                         </div>
