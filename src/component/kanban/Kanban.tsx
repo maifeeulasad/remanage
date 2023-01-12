@@ -5,6 +5,7 @@ import {
   Draggable,
   DropResult,
 } from 'react-beautiful-dnd';
+import { Button, Modal } from 'antd';
 import { DbState, kanbanDb } from '../../database/local/hooks/indexed-db-hooks';
 
 import { IColumn, IKanban } from './kanban.types';
@@ -12,6 +13,7 @@ import { IColumn, IKanban } from './kanban.types';
 const Kanban = ({ cellWidth }: IKanban) => {
   const [kanbanColumns, setKanbanColumns] = useState<IColumn[]>([]);
   const { setColumn, getColumn, dbState } = kanbanDb();
+  const [addItemModalVisibility, setAddItemModalVisibility] = useState(false);
 
   useEffect(() => {
     if (dbState === DbState.COMPLETED) {
@@ -59,46 +61,73 @@ const Kanban = ({ cellWidth }: IKanban) => {
   };
 
   return (
-    <DragDropContext onDragEnd={handleOnDragEnd}>
+    <>
       <div style={{ display: 'flex' }}>
-        {kanbanColumns.map((column) => (
-          <Droppable key={column.title} droppableId={column.id}>
-            {(provided) => (
-              <div
-                style={{ margin: '20px', border: 'red dotted 1px' }}
-                ref={provided.innerRef}
-              >
-                <h3>{column.title}</h3>
-                {column.tasks.map((item, index) => (
-                  <Draggable key={item.id} draggableId={item.id} index={index}>
-                    {(providedItem) => (
-                      <div
-                        ref={providedItem.innerRef}
-                        // eslint-disable-next-line react/jsx-props-no-spreading
-                        {...providedItem.draggableProps}
-                        // eslint-disable-next-line react/jsx-props-no-spreading
-                        {...providedItem.dragHandleProps}
-                      >
-                        <div
-                          style={{
-                            border: 'blue solid 1px',
-                            minWidth: `${cellWidth || '200'} px !important`,
-                          }}
-                        >
-                          <h1>{item.title}</h1>
-                          <p>{item.details}</p>
-                        </div>
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        ))}
+        <div style={{ flex: 1 }} />
+        <Button
+          type="primary"
+          onClick={() => {
+            setAddItemModalVisibility(true);
+          }}
+        >
+          Add Item
+        </Button>
       </div>
-    </DragDropContext>
+      <Modal
+        visible={addItemModalVisibility}
+        closable
+        onCancel={() => {
+          setAddItemModalVisibility(false);
+        }}
+        onOk={() => {
+          setAddItemModalVisibility(false);
+        }}
+      />
+      <DragDropContext onDragEnd={handleOnDragEnd}>
+        <div style={{ display: 'flex' }}>
+          {kanbanColumns.map((column) => (
+            <Droppable key={column.title} droppableId={column.id}>
+              {(provided) => (
+                <div
+                  style={{ margin: '20px', border: 'red dotted 1px' }}
+                  ref={provided.innerRef}
+                >
+                  <h3>{column.title}</h3>
+                  {column.tasks.map((item, index) => (
+                    <Draggable
+                      key={item.id}
+                      draggableId={item.id}
+                      index={index}
+                    >
+                      {(providedItem) => (
+                        <div
+                          ref={providedItem.innerRef}
+                          // eslint-disable-next-line react/jsx-props-no-spreading
+                          {...providedItem.draggableProps}
+                          // eslint-disable-next-line react/jsx-props-no-spreading
+                          {...providedItem.dragHandleProps}
+                        >
+                          <div
+                            style={{
+                              border: 'blue solid 1px',
+                              minWidth: `${cellWidth || '200'} px !important`,
+                            }}
+                          >
+                            <h1>{item.title}</h1>
+                            <p>{item.details}</p>
+                          </div>
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          ))}
+        </div>
+      </DragDropContext>
+    </>
   );
 };
 
