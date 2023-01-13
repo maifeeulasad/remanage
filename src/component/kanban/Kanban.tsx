@@ -5,7 +5,7 @@ import {
   Draggable,
   DropResult,
 } from 'react-beautiful-dnd';
-import { Button, Modal } from 'antd';
+import { Button, Modal, Spin } from 'antd';
 import { kanbanDb } from '../../database/local/hooks/indexed-db-hooks';
 
 import { IKanban } from './kanban.types';
@@ -55,6 +55,7 @@ const Kanban = ({ cellWidth }: IKanban) => {
 
   return (
     <>
+      {loading && <Spin />}
       <div style={{ display: 'flex' }}>
         <div style={{ flex: 1 }} />
         <Button
