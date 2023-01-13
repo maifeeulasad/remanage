@@ -25,13 +25,19 @@ const kanbanDb = () => {
     if (db) {
       getColumn().then((dbColumns) => setKanbanColumnsState(dbColumns));
     }
-  }, [db, loading]);
+  }, [loading]);
 
   const setKanbanColumns = (dbColumns: IColumn[]) => {
     if (db) {
-      setColumnDB(db, dbColumns).then(() => {
-        setKanbanColumnsState(dbColumns);
-      });
+      setLoading(true);
+      setColumnDB(db, dbColumns)
+        .then(() => {
+          setKanbanColumnsState(dbColumns);
+          setLoading(false);
+        })
+        .catch(() => {
+          setLoading(false);
+        });
     }
     throw new Error('DB not initialized');
   };
