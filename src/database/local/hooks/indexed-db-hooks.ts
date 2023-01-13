@@ -15,10 +15,10 @@ const kanbanDb = () => {
   }, []);
 
   const getColumn = () => {
-    if (db) {
-      return getColumnDB(db);
+    if (!db) {
+      throw new Error('DB not initialized');
     }
-    throw new Error('DB not initialized');
+    return getColumnDB(db);
   };
 
   useEffect(() => {
@@ -28,18 +28,18 @@ const kanbanDb = () => {
   }, [loading]);
 
   const setKanbanColumns = (dbColumns: IColumn[]) => {
-    if (db) {
-      setLoading(true);
-      setColumnDB(db, dbColumns)
-        .then(() => {
-          setKanbanColumnsState(dbColumns);
-          setLoading(false);
-        })
-        .catch(() => {
-          setLoading(false);
-        });
+    if (!db) {
+      throw new Error('DB not initialized');
     }
-    throw new Error('DB not initialized');
+    setLoading(true);
+    setColumnDB(db, dbColumns)
+      .then(() => {
+        setKanbanColumnsState(dbColumns);
+        setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false);
+      });
   };
 
   return { kanbanColumns: kanbanColumnsState, setKanbanColumns, loading };
