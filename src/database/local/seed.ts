@@ -12,13 +12,13 @@ const seed = [
         id: 'taka',
         title: 'taka',
         details: 'onk onk taka',
-        metadeta: {},
+        metadeta: '',
       },
       {
         id: 'time',
         title: 'time',
         details: 'time lagbe',
-        metadeta: {},
+        metadeta: '',
       },
       {
         id: 'poralekha',
