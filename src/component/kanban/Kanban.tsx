@@ -170,7 +170,7 @@ const Kanban = ({ cellWidth }: IKanban) => {
                             }}
                           >
                             <h1>{item.title}</h1>
-                            <p>{item.details}</p>
+                            <p title={item.metadeta}>{item.details}</p>
                           </div>
                         </div>
                       )}
