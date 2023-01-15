@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, createRef } from 'react';
 import {
   DragDropContext,
   Droppable,
@@ -8,12 +8,24 @@ import {
 import { Button, Modal, Spin } from 'antd';
 import { kanbanDb } from '../../database/local/hooks/indexed-db-hooks';
 
-import { IKanban } from './kanban.types';
+import { IColumn, IKanban } from './kanban.types';
 import { seed } from '../../database/local/seed';
+import { KanbanItem } from '../kanban-item/KanbanItem';
+import {
+  IKanbanItemForm,
+  IKanbanItemHandle,
+} from '../kanban-item/kanban-item.types';
 
 const Kanban = ({ cellWidth }: IKanban) => {
-  const { setKanbanColumns, kanbanColumns, loading } = kanbanDb();
+  const {
+    kanbanColumns,
+    setKanbanColumns,
+    addNewKanbanColumn,
+    updateKanbanColumn,
+    loading,
+  } = kanbanDb();
   const [addItemModalVisibility, setAddItemModalVisibility] = useState(false);
+  const kanbanItemRef = createRef<IKanbanItemHandle>();
 
   const handleOnDragEnd = (result: DropResult) => {
     if (result.destination === undefined || result.destination === null) {
@@ -61,23 +73,72 @@ const Kanban = ({ cellWidth }: IKanban) => {
         <Button
           type="primary"
           onClick={() => {
-            // setAddItemModalVisibility(true);
             setKanbanColumns(seed);
           }}
         >
           Add Seed
         </Button>
+        <Button
+          type="primary"
+          onClick={() => {
+            setAddItemModalVisibility(true);
+          }}
+        >
+          Add Item
+        </Button>
       </div>
       <Modal
+        title="Add Item"
         visible={addItemModalVisibility}
         closable
         onCancel={() => {
           setAddItemModalVisibility(false);
         }}
         onOk={() => {
-          setAddItemModalVisibility(false);
+          if (kanbanItemRef) {
+            kanbanItemRef.current?.getValue().then((res: IKanbanItemForm) => {
+              const columnName = res.column;
+              const oldColumn = kanbanColumns.find(
+                (kanbanColumn) => kanbanColumn.id === columnName,
+              );
+              if (!oldColumn) {
+                // new column
+                const newColumn: IColumn = {
+                  id: columnName,
+                  title: columnName,
+                  tasks: [
+                    {
+                      id: new Date().toUTCString(),
+                      title: res.title,
+                      details: res.details,
+                      metadeta: res.metadata,
+                    },
+                  ],
+                };
+                addNewKanbanColumn(newColumn);
+              } else {
+                // old column
+                oldColumn.tasks = [
+                  ...oldColumn.tasks,
+                  {
+                    id: new Date().toUTCString(),
+                    title: res.title,
+                    details: res.details,
+                    metadeta: res.metadata,
+                  },
+                ];
+                updateKanbanColumn(oldColumn);
+              }
+              setAddItemModalVisibility(false);
+            });
+          }
         }}
-      />
+      >
+        <KanbanItem
+          ref={kanbanItemRef}
+          columns={kanbanColumns.map((column) => column.title)}
+        />
+      </Modal>
       <DragDropContext onDragEnd={handleOnDragEnd}>
         <div style={{ display: 'flex' }}>
           {kanbanColumns.map((column) => (

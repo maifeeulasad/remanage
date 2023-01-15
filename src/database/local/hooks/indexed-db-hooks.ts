@@ -42,7 +42,45 @@ const kanbanDb = () => {
       });
   };
 
-  return { kanbanColumns: kanbanColumnsState, setKanbanColumns, loading };
+  const addNewKanbanColumn = (dbColumn: IColumn) => {
+    if (!db) {
+      throw new Error('DB not initialized');
+    }
+    const dbColumns = [dbColumn];
+    setLoading(true);
+    setColumnDB(db, dbColumns)
+      .then(() => {
+        setKanbanColumnsState(dbColumns);
+        setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false);
+      });
+  };
+
+  const updateKanbanColumn = (dbColumn: IColumn) => {
+    if (!db) {
+      throw new Error('DB not initialized');
+    }
+    const dbColumns = [dbColumn];
+    setLoading(true);
+    setColumnDB(db, dbColumns)
+      .then(() => {
+        setKanbanColumnsState(dbColumns);
+        setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false);
+      });
+  };
+
+  return {
+    kanbanColumns: kanbanColumnsState,
+    setKanbanColumns,
+    addNewKanbanColumn,
+    updateKanbanColumn,
+    loading,
+  };
 };
 
 export { kanbanDb };
