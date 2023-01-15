@@ -2,7 +2,7 @@ export interface ITask {
   id: string;
   title: string;
   details: string;
-  metadeta?: { [Key: string]: string };
+  metadeta?: string;
 }
 
 export interface IColumn {
