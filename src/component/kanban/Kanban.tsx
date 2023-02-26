@@ -71,6 +71,7 @@ const Kanban = ({ cellWidth }: IKanban) => {
       <div style={{ display: 'flex' }}>
         <div style={{ flex: 1 }} />
         <Button
+          className="m-1"
           type="primary"
           onClick={() => {
             setKanbanColumns(seed);
@@ -79,6 +80,7 @@ const Kanban = ({ cellWidth }: IKanban) => {
           Add Seed
         </Button>
         <Button
+          className="m-1"
           type="primary"
           onClick={() => {
             setAddItemModalVisibility(true);
