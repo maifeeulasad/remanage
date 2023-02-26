@@ -145,6 +145,7 @@ const Kanban = ({ cellWidth }: IKanban) => {
             <Droppable key={column.title} droppableId={column.id}>
               {(provided) => (
                 <div
+                  className="grow"
                   style={{ margin: '20px', border: 'red dotted 1px' }}
                   ref={provided.innerRef}
                 >
