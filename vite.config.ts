@@ -18,6 +18,15 @@ export default defineConfig({
   // comment this out if that isn't relevant for your project
   build: {
     outDir: "./build",
+    rollupOptions: {
+      output:{
+          manualChunks(id) {
+              if (id.includes('node_modules')) {
+                  return id.toString().split('node_modules/')[1].split('/')[0].toString();
+              }
+          }
+      }
+    }
   },
   base: "./",
   plugins: [
