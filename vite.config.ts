@@ -1,7 +1,6 @@
 import { defineConfig } from "vite";
 import svgrPlugin from "vite-plugin-svgr";
 import react from "@vitejs/plugin-react";
-import { esbuildCommonjs } from "@originjs/vite-plugin-commonjs";
 import ViteVisualizer from "rollup-plugin-visualizer";
 
 // https://stackoverflow.com/a/15802301
