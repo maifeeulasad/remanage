@@ -43,9 +43,4 @@ export default defineConfig({
       brotliSize: true,
     }),
   ],
-  optimizeDeps: {
-    esbuildOptions: {
-      plugins: [esbuildCommonjs(["localbase", "util", "ordered-uuid"])],
-    },
-  },
 });
