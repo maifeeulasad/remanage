@@ -5,10 +5,10 @@ import {
   Draggable,
   DropResult,
 } from 'react-beautiful-dnd';
-import { Button, Modal, Spin } from 'antd';
+import { Button, Modal, Spin, Card, List, Typography } from 'antd';
 import { kanbanDb } from '../../database/local/hooks/indexed-db-hooks';
 
-import { IColumn, IKanban } from './kanban.types';
+import { IColumn } from './kanban.types';
 import { seed } from '../../database/local/seed';
 import { KanbanItem } from '../kanban-item/KanbanItem';
 import {
@@ -16,7 +16,9 @@ import {
   IKanbanItemHandle,
 } from '../kanban-item/kanban-item.types';
 
-const Kanban = ({ cellWidth }: IKanban) => {
+import styles from './kanban.module.scss';
+
+const Kanban = () => {
   const {
     kanbanColumns,
     setKanbanColumns,
@@ -145,41 +147,44 @@ const Kanban = ({ cellWidth }: IKanban) => {
         <div style={{ display: 'flex' }}>
           {kanbanColumns.map((column) => (
             <Droppable key={column.title} droppableId={column.id}>
-              {(provided) => (
+              {(provided, snapshot) => (
                 <div
                   className="grow"
                   style={{ margin: '20px', border: 'red dotted 1px' }}
                   ref={provided.innerRef}
                 >
-                  <h3>{column.title}</h3>
-                  {column.tasks.map((item, index) => (
-                    <Draggable
-                      key={item.id}
-                      draggableId={item.id}
-                      index={index}
-                    >
-                      {(providedItem) => (
-                        <div
-                          ref={providedItem.innerRef}
-                          // eslint-disable-next-line react/jsx-props-no-spreading
-                          {...providedItem.draggableProps}
-                          // eslint-disable-next-line react/jsx-props-no-spreading
-                          {...providedItem.dragHandleProps}
+                  <List
+                    header={<Typography.Title level={4}>{column.title}</Typography.Title>}
+                    dataSource={column.tasks}
+                    renderItem={((item, index) => (
+                      <List.Item>
+                        <Draggable
+                          key={item.id}
+                          draggableId={item.id}
+                          index={index}
                         >
-                          <div
-                            style={{
-                              border: 'blue solid 1px',
-                              minWidth: `${cellWidth || '200'} px !important`,
-                            }}
-                          >
-                            <h1>{item.title}</h1>
-                            <p title={item.metadeta}>{item.details}</p>
-                          </div>
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
+                          {(providedItem) => (
+                            <Card
+                              className={!snapshot.draggingFromThisWith ? styles.kanbanCard : ''}
+                              title={item.title}
+                              ref={providedItem.innerRef}
+                              // eslint-disable-next-line react/jsx-props-no-spreading
+                              {...providedItem.draggableProps}
+                              // eslint-disable-next-line react/jsx-props-no-spreading
+                              {...providedItem.dragHandleProps}
+                            >
+                              <Card.Meta
+                                title={item.details}
+                                description={item.metadeta}
+                              />
+                            </Card>
+                          )}
+                        </Draggable>
+                      </List.Item>
+                    ))}
+                  >
+                    {provided.placeholder}
+                  </List>
                 </div>
               )}
             </Droppable>

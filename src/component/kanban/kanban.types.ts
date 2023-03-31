@@ -10,7 +10,3 @@ export interface IColumn {
   title: string;
   tasks: ITask[];
 }
-
-export interface IKanban {
-  cellWidth?: number;
-}
