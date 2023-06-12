@@ -2,10 +2,10 @@ import React from 'react';
 import { Footer as AntdFooter } from 'antd/lib/layout/layout';
 
 const Footer = () => (
-  <AntdFooter style={{ position: 'sticky', bottom: '0' }}>
+  <AntdFooter style={{ position: 'sticky', bottom: '0', marginTop: 'auto' }}>
     <div style={{ textAlign: 'center' }}>
       <div>
-        { /* @ts-ignore */}
+        {/* @ts-ignore */}
         Trace: {__HEAD_COMMIT_HASH__}
       </div>
       <div>
