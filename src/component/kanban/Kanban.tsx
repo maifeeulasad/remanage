@@ -70,10 +70,10 @@ const Kanban = () => {
   return (
     <>
       {loading && <Spin />}
-      <div style={{ display: 'flex' }}>
-        <div style={{ flex: 1 }} />
+      <div className={styles.buttonContainer}>
+        <div className={styles.flexSpace} />
         <Button
-          className="m-1"
+          className={`${styles.button} ${styles.addSeedButton}`}
           type="primary"
           onClick={() => {
             setKanbanColumns(seed);
@@ -82,7 +82,7 @@ const Kanban = () => {
           Add Seed
         </Button>
         <Button
-          className="m-1"
+          className={`${styles.button} ${styles.addItemButton}`}
           type="primary"
           onClick={() => {
             setAddItemModalVisibility(true);
@@ -144,20 +144,19 @@ const Kanban = () => {
         />
       </Modal>
       <DragDropContext onDragEnd={handleOnDragEnd}>
-        <div style={{ display: 'flex' }}>
+        <div className={styles.kanbanContainer}>
           {kanbanColumns.map((column) => (
             <Droppable key={column.title} droppableId={column.id}>
               {(provided, snapshot) => (
                 <div
-                  className="grow"
-                  style={{ margin: '20px', border: 'red dotted 1px' }}
+                  className={styles.columnContainer}
                   ref={provided.innerRef}
                 >
                   <List
-                    header={<Typography.Title level={4}>{column.title}</Typography.Title>}
+                    header={<Typography.Title className={styles.kanbanRowTitle} level={4}>{column.title}</Typography.Title>}
                     dataSource={column.tasks}
                     renderItem={((item, index) => (
-                      <List.Item>
+                      <List.Item className={styles.kanbanListItem}>
                         <Draggable
                           key={item.id}
                           draggableId={item.id}
@@ -165,12 +164,10 @@ const Kanban = () => {
                         >
                           {(providedItem) => (
                             <Card
-                              className={!snapshot.draggingFromThisWith ? styles.kanbanCard : ''}
+                              className={`${styles.kanbanCard} ${snapshot.isDraggingOver ? styles.dragging : ''}`}
                               title={item.title}
                               ref={providedItem.innerRef}
-                              // eslint-disable-next-line react/jsx-props-no-spreading
                               {...providedItem.draggableProps}
-                              // eslint-disable-next-line react/jsx-props-no-spreading
                               {...providedItem.dragHandleProps}
                             >
                               <Card.Meta
