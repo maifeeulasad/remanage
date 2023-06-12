@@ -1,9 +1,11 @@
 import React from 'react';
 import { Footer as AntdFooter } from 'antd/lib/layout/layout';
 
+import styles from './footer.module.scss';
+
 const Footer = () => (
-  <AntdFooter style={{ position: 'sticky', bottom: '0', marginTop: 'auto' }}>
-    <div style={{ textAlign: 'center' }}>
+  <AntdFooter className={styles.footer}>
+    <div className={styles.footerTextCenter}>
       <div>
         {/* @ts-ignore */}
         Trace: {__HEAD_COMMIT_HASH__}
