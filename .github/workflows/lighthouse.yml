@@ -1,10 +1,10 @@
-name: Lighthouse Report Generation
+name: Lighthouse report generation
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   lighthouse:
@@ -13,22 +13,22 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: 'Installing deps'
+      - name: "Installing deps"
         run: |
           yarn
           npm i -g @lhci/cli@0.9.x serve
 
-      - name: 'Build Prodcution'
+      - name: "Build Prodcution"
         run: yarn build
 
-      - name: 'Serve Prodcution Server'
+      - name: "Serve Prodcution Server"
         run: serve -s build &
 
-      - name: 'Run Lighthouse tests'
+      - name: "Run Lighthouse tests"
         continue-on-error: true
         run: lhci autorun
 
-      - name: 'Upload report'
+      - name: "Upload report"
         uses: actions/upload-artifact@v2
         if: always()
         with:
