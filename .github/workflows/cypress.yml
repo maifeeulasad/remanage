@@ -35,4 +35,4 @@ jobs:
       with:
         name: videos
         path: |
-        cypress/videos
+          cypress/videos
