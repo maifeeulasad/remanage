@@ -10,6 +10,7 @@ import { EditableDropdown } from '../generic/editable-dropdown/EditableDropdown'
 const KanbanItem = forwardRef<IKanbanItemHandle, IKanbanItem>(
   ({ columns }, ref) => {
     const [form] = Form.useForm<IKanbanItemForm>();
+
     useImperativeHandle(ref, () => ({
       getValue() {
         return new Promise<IKanbanItemForm>((resolve, reject) => {
@@ -18,6 +19,7 @@ const KanbanItem = forwardRef<IKanbanItemHandle, IKanbanItem>(
             .then(() => {
               const formValue = form.getFieldsValue();
               resolve(formValue);
+              form.resetFields();
             })
             .catch(() => {
               reject();
