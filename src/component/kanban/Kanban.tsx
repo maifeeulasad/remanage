@@ -122,6 +122,7 @@ const Kanban = () => {
         <Button
           className={`${styles.button} ${styles.addSeedButton}`}
           type="primary"
+          data-cy="add-seed"
           onClick={() => {
             setKanbanColumns(seed);
           }}
@@ -162,6 +163,7 @@ const Kanban = () => {
                         >
                           {(providedItem) => (
                             <Card
+                              data-cy="kanban-card" 
                               className={`${styles.kanbanCard} ${snapshot.isDraggingOver ? styles.dragging : ''}`}
                               title={item.title}
                               ref={providedItem.innerRef}
