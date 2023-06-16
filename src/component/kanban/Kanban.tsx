@@ -5,7 +5,7 @@ import {
   Draggable,
   DropResult,
 } from 'react-beautiful-dnd';
-import { Button, Modal, Spin, Card, List, Typography } from 'antd';
+import { Button, Spin, Card, List, Typography } from 'antd';
 import { kanbanDb } from '../../database/local/hooks/indexed-db-hooks';
 
 import { IColumn } from './kanban.types';
@@ -26,7 +26,6 @@ const Kanban = () => {
     updateKanbanColumn,
     loading,
   } = kanbanDb();
-  const [addItemModalVisibility, setAddItemModalVisibility] = useState(false);
   const kanbanItemRef = createRef<IKanbanItemHandle>();
 
   const handleOnDragEnd = (result: DropResult) => {
@@ -67,6 +66,54 @@ const Kanban = () => {
     setKanbanColumns(newKanbanColumns);
   };
 
+  const onOkayClicked = () => {
+    if (!kanbanItemRef || !kanbanItemRef.current) {
+      return;
+    }
+    kanbanItemRef.current.getValue().then((res: IKanbanItemForm) => {
+      const columnName = res.column;
+      const oldColumn = kanbanColumns.find(
+        (kanbanColumn) => kanbanColumn.id === columnName,
+      );
+      if (!oldColumn) {
+        // new column
+        const newColumn: IColumn = {
+          id: columnName,
+          title: columnName,
+          tasks: [
+            {
+              id: new Date().toUTCString(),
+              title: res.title,
+              details: res.details,
+              metadeta: res.metadata,
+            },
+          ],
+        };
+        addNewKanbanColumn(newColumn);
+      } else {
+        // old column
+        oldColumn.tasks = [
+          ...oldColumn.tasks,
+          {
+            id: new Date().toUTCString(),
+            title: res.title,
+            details: res.details,
+            metadeta: res.metadata,
+          },
+        ];
+        updateKanbanColumn(oldColumn);
+      }
+    });
+    kanbanItemRef.current.close();
+  }
+
+  const openNewItemModal = () => {
+    if (!kanbanItemRef || !kanbanItemRef.current) {
+      return;
+    }
+    kanbanItemRef.current.open();
+  }
+
   return (
     <>
       {loading && <Spin />}
@@ -84,65 +131,16 @@ const Kanban = () => {
         <Button
           className={`${styles.button} ${styles.addItemButton}`}
           type="primary"
-          onClick={() => {
-            setAddItemModalVisibility(true);
-          }}
+          onClick={() => openNewItemModal()}
         >
           Add Item
         </Button>
       </div>
-      <Modal
-        title="Add Item"
-        visible={addItemModalVisibility}
-        closable
-        onCancel={() => {
-          setAddItemModalVisibility(false);
-        }}
-        onOk={() => {
-          if (kanbanItemRef) {
-            kanbanItemRef.current?.getValue().then((res: IKanbanItemForm) => {
-              const columnName = res.column;
-              const oldColumn = kanbanColumns.find(
-                (kanbanColumn) => kanbanColumn.id === columnName,
-              );
-              if (!oldColumn) {
-                // new column
-                const newColumn: IColumn = {
-                  id: columnName,
-                  title: columnName,
-                  tasks: [
-                    {
-                      id: new Date().toUTCString(),
-                      title: res.title,
-                      details: res.details,
-                      metadeta: res.metadata,
-                    },
-                  ],
-                };
-                addNewKanbanColumn(newColumn);
-              } else {
-                // old column
-                oldColumn.tasks = [
-                  ...oldColumn.tasks,
-                  {
-                    id: new Date().toUTCString(),
-                    title: res.title,
-                    details: res.details,
-                    metadeta: res.metadata,
-                  },
-                ];
-                updateKanbanColumn(oldColumn);
-              }
-              setAddItemModalVisibility(false);
-            });
-          }
-        }}
-      >
-        <KanbanItem
-          ref={kanbanItemRef}
-          columns={kanbanColumns.map((column) => column.title)}
-        />
-      </Modal>
+      <KanbanItem
+        ref={kanbanItemRef}
+        columns={kanbanColumns.map((column) => column.title)}
+        onOkClicked={() => { onOkayClicked() }}
+      />
       <DragDropContext onDragEnd={handleOnDragEnd}>
         <div className={styles.kanbanContainer}>
           {kanbanColumns.map((column) => (

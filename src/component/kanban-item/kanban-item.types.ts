@@ -1,8 +1,11 @@
 interface IKanbanItemHandle {
+  open(): void;
+  close(): void;
   getValue(): Promise<IKanbanItemForm>;
 }
 
 interface IKanbanItem {
+  onOkClicked(): void;
   columns: string[];
 }
 
