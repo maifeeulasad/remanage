@@ -2,13 +2,12 @@ name: Cypress report generation
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
-  build:
-
+  cypress:
     runs-on: ubuntu-latest
 
     strategy:
@@ -16,23 +15,25 @@ jobs:
         node-version: [16.x]
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: 'Installing Deps'    
-      run: yarn
-    - name: 'Prodcution Build'
-      run: yarn build
-    - name: 'Serve Prodcution Build'
-      run: serve -s build &
-    - name: 'Cypress test'
-      run: yarn cy:run
-    - name: 'Upload videos'
-      uses: actions/upload-artifact@v2
-      if: always()
-      with:
-        name: videos
-        path: |
-          cypress/videos
+      - uses: actions/checkout@v1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: "Installing Deps"
+        run: |
+          yarn
+          npm i -g serve
+      - name: "Prodcution Build"
+        run: yarn build
+      - name: "Serve Prodcution Build"
+        run: serve -s build &
+      - name: "Cypress test"
+        run: yarn cy:run
+      - name: "Upload videos"
+        uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: videos
+          path: |
+            cypress/videos
