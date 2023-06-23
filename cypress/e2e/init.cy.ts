@@ -3,3 +3,7 @@ describe('ui test', () => {
     cy.visit('http://localhost:3000/remanage')
   })
 })
+
+Cypress.on("window:before:load", win => {
+  win.indexedDB.deleteDatabase("kanban");
+});

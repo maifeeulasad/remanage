@@ -1,9 +1,13 @@
 describe('seed test', () => {
-    it('tests loading seed data', () => {
-      cy.visit('http://localhost:3000/remanage')
-      cy.wait(2000)
-      cy.get("[data-cy='kanban-card']").should('not.exist')
-      cy.get("[data-cy='add-seed']").click()
-      cy.get("[data-cy='kanban-card']")
+    it('tests loading seed data on add seed click', () => {
+        cy.visit('http://localhost:3000/remanage')
+        cy.wait(2000)
+        cy.get("[data-cy='kanban-card']").should('not.exist')
+        cy.get("[data-cy='add-seed']").click()
+        cy.get("[data-cy='kanban-card']")
     })
-  })
+})
+
+Cypress.on("window:before:load", win => {
+    win.indexedDB.deleteDatabase("kanban");
+});

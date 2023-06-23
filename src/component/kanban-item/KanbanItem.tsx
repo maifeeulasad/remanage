@@ -38,14 +38,11 @@ const KanbanItem = forwardRef<IKanbanItemHandle, IKanbanItem>(
     return (
       <Modal
         title="Add Item"
+        data-cy="add-item-modal"
         visible={addItemModalVisibility}
         closable
-        onCancel={() => {
-          setAddItemModalVisibility(false);
-        }}
-        onOk={() => {
-          onOkClicked();
-        }}
+        onCancel={() => setAddItemModalVisibility(false)}
+        onOk={() => onOkClicked()}
       >
         <Form form={form}>
           <Form.Item

@@ -123,15 +123,14 @@ const Kanban = () => {
           className={`${styles.button} ${styles.addSeedButton}`}
           type="primary"
           data-cy="add-seed"
-          onClick={() => {
-            setKanbanColumns(seed);
-          }}
+          onClick={() => setKanbanColumns(seed)}
         >
           Add Seed
         </Button>
         <Button
           className={`${styles.button} ${styles.addItemButton}`}
           type="primary"
+          data-cy="add-item"
           onClick={() => openNewItemModal()}
         >
           Add Item
@@ -163,7 +162,7 @@ const Kanban = () => {
                         >
                           {(providedItem) => (
                             <Card
-                              data-cy="kanban-card" 
+                              data-cy="kanban-card"
                               className={`${styles.kanbanCard} ${snapshot.isDraggingOver ? styles.dragging : ''}`}
                               title={item.title}
                               ref={providedItem.innerRef}
