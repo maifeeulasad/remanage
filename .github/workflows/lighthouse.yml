@@ -33,6 +33,8 @@ jobs:
         if: always()
         with:
           name: lhci-reports
+          include-hidden-files: true
+          # it's required for v4: https://github.com/actions/upload-artifact/tree/184d73b71b93c222403b2e7f1ffebe4508014249?tab=readme-ov-file#uploading-hidden-files
           path: |
             .lighthouseci/
           # if-no-files-found: error
