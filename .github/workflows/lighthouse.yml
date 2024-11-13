@@ -9,6 +9,9 @@ on:
 jobs:
   lighthouse:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./remanage
 
     steps:
       - uses: actions/checkout@v2
@@ -34,6 +37,6 @@ jobs:
         with:
           name: lhci-reports
           path: |
-            .lighthouseci/
+            remanage/.lighthouseci/
           # if-no-files-found: error
           # if: ${{ success() && steps.lighthouse.outputs.hasHtmlReport == 'true' && steps.lighthouse.outputs.hasJsonReport == 'true' }}
