@@ -2,7 +2,9 @@ name: Lighthouse report generation
 
 on:
   push:
-    branches: [fix-lighthouse-report-upload-action]
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   lighthouse:
