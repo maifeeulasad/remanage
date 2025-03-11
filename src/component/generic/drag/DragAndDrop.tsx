@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ReactNode, useRef } from "react";
+import React, { createContext, useContext, ReactNode, useRef, useState } from "react";
 
 interface DropResult {
   source: {
@@ -78,33 +78,45 @@ const Droppable = ({ droppableId, children }: DroppableProps) => {
 interface DraggableProps {
   draggableId: string;
   index: number;
-  children: (provided: { innerRef: (node: HTMLElement | null) => void; draggableProps: any; dragHandleProps: any }) => JSX.Element;
+  children: (provided: { 
+    innerRef: (node: HTMLElement | null) => void; 
+    draggableProps: any; 
+    dragHandleProps: any; 
+    dragging: boolean;
+  }) => JSX.Element;
 }
 
 const Draggable = ({ draggableId, index, children }: DraggableProps) => {
   const droppableContext = useContext(DroppableContext);
+  const [dragging, setDragging] = useState(false);
+
   if (!droppableContext) {
     throw new Error("Draggable must be used within a Droppable");
   }
 
   const handleDragStart = (event: React.DragEvent) => {
+    setDragging(true);
     event.dataTransfer.setData("draggableId", draggableId);
     event.dataTransfer.setData("sourceIndex", index.toString());
     event.dataTransfer.setData("sourceDroppableId", droppableContext.droppableId);
   };
 
-  return children(
-    {
-      innerRef: (node) => {
-        if (node) {
-          node.setAttribute("draggable", "true");
-          node.addEventListener("dragstart", handleDragStart as any);
-        }
-      },
-      draggableProps: { draggable: true },
-      dragHandleProps: {},
-    }
-  );
+  const handleDragEnd = () => {
+    setDragging(false);
+  };
+
+  return children({
+    innerRef: (node) => {
+      if (node) {
+        node.setAttribute("draggable", "true");
+        node.addEventListener("dragstart", handleDragStart as any);
+        node.addEventListener("dragend", handleDragEnd as any);
+      }
+    },
+    draggableProps: { draggable: true },
+    dragHandleProps: {},
+    dragging,
+  });
 };
 
 export { DragDropContext, Droppable, Draggable };
