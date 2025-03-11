@@ -145,7 +145,7 @@ const Kanban = () => {
         <div className={styles.kanbanContainer}>
           {kanbanColumns.map((column) => (
             <Droppable key={column.title} droppableId={column.id}>
-              {(provided, snapshot) => (
+              {(provided) => (
                 <div
                   className={styles.columnContainer}
                   ref={provided.innerRef}
@@ -163,7 +163,7 @@ const Kanban = () => {
                           {(providedItem) => (
                             <Card
                               data-cy="kanban-card"
-                              className={`${styles.kanbanCard} ${snapshot.isDraggingOver ? styles.dragging : ''}`}
+                              className={`${styles.kanbanCard} ${providedItem.dragging ? styles.dragging : ''}`}
                               title={item.title}
                               ref={providedItem.innerRef}
                               {...providedItem.draggableProps}
