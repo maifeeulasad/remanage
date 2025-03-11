@@ -4,7 +4,7 @@ import {
   Droppable,
   Draggable,
   DropResult,
-} from 'react-beautiful-dnd';
+} from '../generic/drag/DragAndDrop';
 import { Button, Spin, Card, List, Typography } from 'antd';
 import { kanbanDb } from '../../database/local/hooks/indexed-db-hooks';
 
