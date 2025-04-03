@@ -1,3 +1,3 @@
-# Remange
+# remange
 
-GitHub page should be available here: https://maifeeulasad.github.io/remanage
+Demo (GitHub Page): https://maifeeulasad.github.io/remanage
