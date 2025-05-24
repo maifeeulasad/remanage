@@ -22,8 +22,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: "Installing Deps"
         run: |
+          npm i -g serve pnpm
           pnpm i
-          npm i -g serve
       - name: "Prodcution Build"
         run: pnpm build
       - name: "Serve Prodcution Build"
