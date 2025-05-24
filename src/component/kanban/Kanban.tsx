@@ -1,9 +1,10 @@
-import React, { useState, createRef } from 'react';
+import React, { useContext, createRef } from 'react';
 import {
   DragDropContext,
   Droppable,
   Draggable,
   DropResult,
+  DropIndexContext,
 } from '../generic/drag/DragAndDrop';
 import { Button, Spin, Card, List, Typography } from 'antd';
 import { kanbanDb } from '../../database/local/hooks/indexed-db-hooks';
@@ -145,44 +146,74 @@ const Kanban = () => {
         <div className={styles.kanbanContainer}>
           {kanbanColumns.map((column) => (
             <Droppable key={column.title} droppableId={column.id}>
-              {(provided) => (
-                <div
-                  className={styles.columnContainer}
-                  ref={provided.innerRef}
-                >
-                  <List
-                    header={<Typography.Title className={styles.kanbanRowTitle} level={4}>{column.title}</Typography.Title>}
-                    dataSource={column.tasks}
-                    renderItem={((item, index) => (
-                      <List.Item className={styles.kanbanListItem}>
-                        <Draggable
-                          key={item.id}
-                          draggableId={item.id}
-                          index={index}
+              {(provided, snapshot) => {
+                const { dragOverIndex } = useContext(DropIndexContext)!;
+                const isCurrentColumn = snapshot.isDraggingOver;
+                const itemsWithPlaceholder = [...column.tasks];
+                
+                if (
+                  isCurrentColumn &&
+                  dragOverIndex !== null &&
+                  dragOverIndex <= itemsWithPlaceholder.length
+                ) {
+                  itemsWithPlaceholder.splice(dragOverIndex, 0, {
+                    id: "__placeholder__",
+                    title: "",
+                    details: "",
+                    metadeta: "",
+                    isPlaceholder: true,
+                  });
+                }
+
+                return (
+                  <div className={styles.columnContainer} ref={provided.innerRef}>
+                    <List
+                      header={
+                        <Typography.Title
+                          className={styles.kanbanRowTitle}
+                          level={4}
                         >
-                          {(providedItem) => (
-                            <Card
-                              data-cy="kanban-card"
-                              className={`${styles.kanbanCard} ${providedItem.dragging ? styles.dragging : ''}`}
-                              title={item.title}
-                              ref={providedItem.innerRef}
-                              {...providedItem.draggableProps}
-                              {...providedItem.dragHandleProps}
+                          {column.title}
+                        </Typography.Title>
+                      }
+                      dataSource={itemsWithPlaceholder}
+                      renderItem={(item, index) =>
+                        item.isPlaceholder ? (
+                          <div
+                            key="placeholder"
+                            className={styles.kanbanPlaceholder}
+                          />
+                        ) : (
+                          <List.Item className={styles.kanbanListItem}>
+                            <Draggable
+                              key={item.id}
+                              draggableId={item.id}
+                              index={index}
                             >
-                              <Card.Meta
-                                title={item.details}
-                                description={item.metadeta}
-                              />
-                            </Card>
-                          )}
-                        </Draggable>
-                      </List.Item>
-                    ))}
-                  >
-                    {provided.placeholder}
-                  </List>
-                </div>
-              )}
+                              {(providedItem) => (
+                                <Card
+                                  data-cy="kanban-card"
+                                  className={`${styles.kanbanCard} ${providedItem.dragging ? styles.dragging : ""
+                                    }`}
+                                  title={item.title}
+                                  ref={providedItem.innerRef}
+                                  {...providedItem.draggableProps}
+                                  {...providedItem.dragHandleProps}
+                                >
+                                  <Card.Meta
+                                    title={item.details}
+                                    description={item.metadeta}
+                                  />
+                                </Card>
+                              )}
+                            </Draggable>
+                          </List.Item>
+                        )
+                      }
+                    />
+                  </div>
+                );
+              }}
             </Droppable>
           ))}
         </div>
