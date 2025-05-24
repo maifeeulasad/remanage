@@ -22,14 +22,14 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: "Installing Deps"
         run: |
-          yarn
+          pnpm i
           npm i -g serve
       - name: "Prodcution Build"
-        run: yarn build
+        run: pnpm build
       - name: "Serve Prodcution Build"
         run: serve -s build &
       - name: "Cypress test"
-        run: yarn cy:run
+        run: pnpm cy:run
       - name: "Upload videos"
         uses: actions/upload-artifact@v4
         if: always()
