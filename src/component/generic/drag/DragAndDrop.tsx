@@ -23,9 +23,39 @@ interface DragDropContextProps {
   children: ReactNode;
 }
 
+const DropIndexContext = createContext<{
+  dragOverIndex: number | null;
+  setDragOverIndex: (index: number | null) => void;
+} | null>(null);
+
 const DragDropContext = ({ onDragEnd, children }: DragDropContextProps) => {
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+
+  const handleDragOver = (event: React.DragEvent) => {
+    const destinationElement = (event.target as HTMLElement).closest(
+      "[data-droppable-id]"
+    );
+    if (!destinationElement) return;
+
+    const targetDraggable = (event.target as HTMLElement).closest(
+      "[data-draggable-id]"
+    );
+    let destinationIndex = 0;
+
+    if (targetDraggable) {
+      const siblings = Array.from(
+        destinationElement.querySelectorAll("[data-draggable-id]")
+      );
+      destinationIndex = siblings.findIndex((el) => el === targetDraggable);
+      if (destinationIndex === -1) destinationIndex = siblings.length;
+    }
+
+    setDragOverIndex(destinationIndex);
+  };
+
   const handleDragEnd = (event: React.DragEvent) => {
     event.preventDefault();
+
     const sourceIndex = Number(event.dataTransfer.getData("sourceIndex"));
     const sourceDroppableId = event.dataTransfer.getData("sourceDroppableId");
     const draggableId = event.dataTransfer.getData("draggableId");
@@ -61,13 +91,22 @@ const DragDropContext = ({ onDragEnd, children }: DragDropContextProps) => {
       draggableId,
     };
 
+    setDragOverIndex(null);
     onDragEnd(dropResult);
   };
 
   return (
-    <div onDragOver={(e) => e.preventDefault()} onDrop={handleDragEnd}>
-      {children}
-    </div>
+    <DropIndexContext.Provider value={{ dragOverIndex, setDragOverIndex }}>
+      <div
+        onDragOver={(e) => {
+          e.preventDefault();
+          handleDragOver(e);
+        }}
+        onDrop={handleDragEnd}
+      >
+        {children}
+      </div>
+    </DropIndexContext.Provider>
   );
 };
 
@@ -86,6 +125,8 @@ interface DroppableProps {
 
 const Droppable = ({ droppableId, children }: DroppableProps) => {
   const ref = useRef<HTMLElement | null>(null);
+  const { dragOverIndex } = useContext(DropIndexContext)!;
+
   return (
     <DroppableContext.Provider value={{ droppableId }}>
       {children(
@@ -96,9 +137,20 @@ const Droppable = ({ droppableId, children }: DroppableProps) => {
               node.setAttribute("data-droppable-id", droppableId);
             }
           },
-          placeholder: <div style={{ height: "10px" }} />,
+          placeholder:
+            dragOverIndex !== null ? (
+              <div
+                key="__placeholder__"
+                style={{
+                  height: "40px",
+                  background: "#e0e0e0",
+                  border: "2px dashed #aaa",
+                  marginBottom: "8px",
+                }}
+              />
+            ) : null,
         },
-        { isDraggingOver: false }
+        { isDraggingOver: dragOverIndex !== null }
       )}
     </DroppableContext.Provider>
   );
@@ -154,5 +206,5 @@ const Draggable = ({ draggableId, index, children }: DraggableProps) => {
   });
 };
 
-export { DragDropContext, Droppable, Draggable };
+export { DragDropContext, Droppable, Draggable, DropIndexContext };
 export type { DropResult };
