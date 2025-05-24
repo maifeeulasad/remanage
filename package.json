@@ -1,7 +1,7 @@
 {
   "name": "react-mua-pipeline",
   "version": "0.3.0",
-  "private": true,
+  "private": false,
   "homepage": ".",
   "dependencies": {
     "@ant-design/icons": "^5.0.0",
