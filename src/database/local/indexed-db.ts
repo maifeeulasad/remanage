@@ -1,50 +1,88 @@
-import { IColumn } from '../../component/kanban/kanban.types';
+import { Database, DataClass, KeyPath, Index } from 'idb-ts';
+import { IColumn, ITask } from '../../component/kanban/kanban.types';
 
-const initDb = (): Promise<IDBDatabase> =>
-  new Promise((resolve, reject) => {
-    const request = indexedDB.open('kanban', 1);
+@DataClass()
+class Task implements ITask {
+  @KeyPath()
+  id!: string;
 
-    request.onsuccess = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
-      resolve(db);
-    };
+  @Index()
+  title!: string;
 
-    request.onerror = () => reject();
+  details!: string;
+  metadeta?: string;
+  isPlaceholder?: boolean;
 
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
+  constructor(id: string, title: string, details: string, metadeta?: string, isPlaceholder?: boolean) {
+    this.id = id;
+    this.title = title;
+    this.details = details;
+    this.metadeta = metadeta;
+    this.isPlaceholder = isPlaceholder;
+  }
+}
 
-      db.createObjectStore('kanban', {
-        keyPath: 'id',
-      });
-    };
-  });
+@DataClass()
+class Column implements IColumn {
+  @KeyPath()
+  id!: string;
 
-const getColumnDB = (db: IDBDatabase): Promise<IColumn[]> =>
-  new Promise((resolve, reject) => {
-    const transaction = db.transaction(['kanban'], 'readonly');
+  @Index()
+  title!: string;
 
-    transaction.onerror = (event) => {
-      reject(event);
-    };
+  tasks!: ITask[];
 
-    const store = transaction.objectStore('kanban');
-    store.getAll().onsuccess = (event) => {
-      // @ts-ignore
-      resolve(event.target.result as IColumn[]);
-    };
-  });
+  constructor(id: string, title: string, tasks: ITask[] = []) {
+    this.id = id;
+    this.title = title;
+    this.tasks = tasks;
+  }
+}
 
-const setColumnDB = (db: IDBDatabase, columns: IColumn[]): Promise<void> =>
-  new Promise((resolve, reject) => {
-    const transaction = db.transaction(['kanban'], 'readwrite');
+type KanbanDatabase = {
+  Column: any;
+  Task: any;
+};
 
-    transaction.oncomplete = () => resolve();
+let dbInstance: any = null;
 
-    transaction.onerror = (event) => reject(event);
+const initDb = async (): Promise<any> => {
+  if (dbInstance) {
+    return dbInstance;
+  }
+  dbInstance = await Database.build('kanban', [Column, Task]);
+  return dbInstance;
+};
 
-    const store = transaction.objectStore('kanban');
-    columns.map((column) => store.put(column));
-  });
+const getColumnDB = async (): Promise<IColumn[]> => {
+  const db = await initDb();
+  return await db.Column.list();
+};
 
-export { initDb, getColumnDB, setColumnDB };
+const setColumnDB = async (columns: IColumn[]): Promise<void> => {
+  const db = await initDb();
+  
+  // Update or create each column
+  for (const column of columns) {
+    const columnEntity = new Column(column.id, column.title, column.tasks);
+    try {
+      await db.Column.update(columnEntity);
+    } catch {
+      await db.Column.create(columnEntity);
+    }
+  }
+};
+
+const addColumnDB = async (column: IColumn): Promise<void> => {
+  const db = await initDb();
+  const columnEntity = new Column(column.id, column.title, column.tasks);
+  await db.Column.create(columnEntity);
+};
+
+const updateColumnDB = async (column: IColumn): Promise<void> => {
+  const db = await initDb();
+  const columnEntity = new Column(column.id, column.title, column.tasks);
+  await db.Column.update(columnEntity);
+};
+
+export { initDb, getColumnDB, setColumnDB, addColumnDB, updateColumnDB, Column, Task };
