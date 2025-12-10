@@ -2,7 +2,7 @@
     "ci": {
       "collect": {
         "numberOfRuns": 2,
-        "url": ["http://localhost:3000/remanage"]
+        "url": ["http://localhost:5173/remanage"]
       },
       "output": [
         "html",
