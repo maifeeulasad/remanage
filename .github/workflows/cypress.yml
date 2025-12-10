@@ -27,7 +27,7 @@ jobs:
       - name: "Prodcution Build"
         run: pnpm build
       - name: "Serve Prodcution Build"
-        run: serve -s build &
+        run: serve -s build -p 5173 &
       - name: "Cypress test"
         run: pnpm exec cypress install && pnpm cy:run
       - name: "Upload videos"
