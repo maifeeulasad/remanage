@@ -1,77 +1,63 @@
 import React, { useEffect, useState } from 'react';
 import { IColumn } from '../../../component/kanban/kanban.types';
-import { getColumnDB, initDb, setColumnDB } from '../indexed-db';
+import { getColumnDB, initDb, setColumnDB, updateColumnDB } from '../indexed-db';
 
 const kanbanDb = () => {
   const [loading, setLoading] = useState(true);
-  const [db, setDb] = useState<IDBDatabase | undefined>(undefined);
   const [kanbanColumnsState, setKanbanColumnsState] = useState<IColumn[]>([]);
 
   useEffect(() => {
-    initDb().then((idb) => {
-      setDb(idb);
-      setLoading(false);
-    });
+    const loadData = async () => {
+      try {
+        await initDb();
+        const dbColumns = await getColumnDB();
+        setKanbanColumnsState(dbColumns);
+        setLoading(false);
+      } catch (error) {
+        console.error('Failed to initialize database:', error);
+        setLoading(false);
+      }
+    };
+    loadData();
   }, []);
 
-  const getColumn = () => {
-    if (!db) {
-      throw new Error('DB not initialized');
+  const setKanbanColumns = async (dbColumns: IColumn[]) => {
+    setLoading(true);
+    try {
+      await setColumnDB(dbColumns);
+      setKanbanColumnsState(dbColumns);
+    } catch (error) {
+      console.error('Failed to set columns:', error);
+    } finally {
+      setLoading(false);
     }
-    return getColumnDB(db);
   };
 
-  useEffect(() => {
-    if (db) {
-      getColumn().then((dbColumns) => setKanbanColumnsState(dbColumns));
-    }
-  }, [loading]);
-
-  const setKanbanColumns = (dbColumns: IColumn[]) => {
-    if (!db) {
-      throw new Error('DB not initialized');
-    }
+  const addNewKanbanColumn = async (dbColumn: IColumn) => {
     setLoading(true);
-    setColumnDB(db, dbColumns)
-      .then(() => {
-        setKanbanColumnsState(dbColumns);
-        setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
+    try {
+      await setColumnDB([dbColumn]);
+      setKanbanColumnsState([...kanbanColumnsState, dbColumn]);
+    } catch (error) {
+      console.error('Failed to add column:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const addNewKanbanColumn = (dbColumn: IColumn) => {
-    if (!db) {
-      throw new Error('DB not initialized');
-    }
-    const dbColumns = [dbColumn];
+  const updateKanbanColumn = async (dbColumn: IColumn) => {
     setLoading(true);
-    setColumnDB(db, dbColumns)
-      .then(() => {
-        setKanbanColumnsState(dbColumns);
-        setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
-  };
-
-  const updateKanbanColumn = (dbColumn: IColumn) => {
-    if (!db) {
-      throw new Error('DB not initialized');
+    try {
+      await updateColumnDB(dbColumn);
+      const updatedColumns = kanbanColumnsState.map(col => 
+        col.id === dbColumn.id ? dbColumn : col
+      );
+      setKanbanColumnsState(updatedColumns);
+    } catch (error) {
+      console.error('Failed to update column:', error);
+    } finally {
+      setLoading(false);
     }
-    const dbColumns = [dbColumn];
-    setLoading(true);
-    setColumnDB(db, dbColumns)
-      .then(() => {
-        setKanbanColumnsState(dbColumns);
-        setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
   };
 
   return {
