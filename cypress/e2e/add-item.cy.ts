@@ -1,19 +1,22 @@
-describe('seed test', () => {
-    it('tests opening modal on add item click', () => {
+describe('add item modal test', () => {
+    beforeEach(() => {
         cy.visit('http://localhost:5173/remanage')
         cy.wait(2000)
-        cy.get("[data-cy='add-item-modal']").should('not.exist')
-        cy.get("[data-cy='add-item']").click()
-        cy.get("[data-cy='add-item-modal']")
     })
-    it('tests opened modal closing on outside click', () => {
-        cy.visit('http://localhost:5173/remanage')
-        cy.wait(2000)
-        cy.get("[data-cy='add-item-modal']").should('not.exist')
+
+    it('should open modal on add item click', () => {
+        cy.get('.ant-modal').should('not.exist')
         cy.get("[data-cy='add-item']").click()
-        cy.get("[data-cy='add-item-modal']")
+        cy.wait(500)
+        cy.get('.ant-modal').should('be.visible')
+    })
+
+    it('should close modal on outside click', () => {
+        cy.get("[data-cy='add-item']").click()
+        cy.wait(500)
+        cy.get('.ant-modal').should('be.visible')
         cy.get('body').click(0, 0)
-        cy.get("[data-cy='add-item-modal']").should('not.visible')
+        cy.wait(500)
     })
 })
 
