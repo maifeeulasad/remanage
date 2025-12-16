@@ -27,9 +27,9 @@ export default defineConfig({
           }
       }
     },
-    esbuild: {
-      keepNames: true,
-    }
+  },
+  esbuild: {
+    keepNames: true,
   },
   base: "./",
   plugins: [
